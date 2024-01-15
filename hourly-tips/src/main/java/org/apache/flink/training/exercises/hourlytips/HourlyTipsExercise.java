@@ -34,8 +34,6 @@ import org.apache.flink.training.exercises.common.datatypes.TaxiFare;
 import org.apache.flink.training.exercises.common.sources.TaxiFareGenerator;
 import org.apache.flink.util.Collector;
 
-import java.util.stream.StreamSupport;
-
 /**
  * The Hourly Tips exercise from the Flink training.
  *
@@ -124,8 +122,10 @@ public class HourlyTipsExercise {
                 Iterable<TaxiFare> fares,
                 Collector<Tuple3<Long, Long, Float>> out) {
 
-            float sumOfTips = StreamSupport.stream(fares.spliterator(), false)
-                    .map(taxiFare -> taxiFare.tip).reduce(0F, Float::sum);
+            float sumOfTips = 0F;
+            for (TaxiFare f : fares) {
+                sumOfTips += f.tip;
+            }
             out.collect(Tuple3.of(context.window().getEnd(), key, sumOfTips));
         }
     }
